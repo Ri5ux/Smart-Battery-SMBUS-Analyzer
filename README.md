@@ -2,13 +2,16 @@
 Development Board: Arduino Pro Mini<br/>
 Baud Rate: 115200<br/>
 Smart Battery System specification datasheet: http://sbs-forum.org/specs/sbdat110.pdf
-<br/><br/><br/>
+<br/><br/>
 Commands: mode<br/>
 mode [onplug/continuous] - Sets the analyzer in one of two modes. OnPlug shows battery info only when the battery is initially plugged in. Continuous shows battery info in 2.5s intervals.
-<br/><br/><br/>
+<br/><br/>
 Known SMBUS Device Addresses:<br/>
 [11] Acer AL12X32, Acer AL12A32
-<br/><br/><br/>
+<br/><br/>
+Texas Instruments BMS Gas Guage IC Note: Acer Battery Model AL12X32 uses a TI BQ9000 IC, which is 'proprietary' according to TI; however, it appears to be a re-branded TI BQ4050.<br/>
+Datasheet: http://www.ti.com/lit/ds/symlink/bq4050.pdf
+<br/><br/>
 Used Parameters:
 <ul>
 <li/>VOLTAGE 0x09
