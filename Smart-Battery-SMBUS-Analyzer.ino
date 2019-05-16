@@ -6,13 +6,13 @@
 
 #include <SoftI2CMaster.h>
 
+#define MODE 0x03
 #define VOLTAGE 0x09
 #define TEMPERATURE 0x08
 #define CURRENT 0x0a
 #define CAPACITY 0x10
 #define TIME_TO_FULL 0x13
 #define CHARGE 0x0d
-
 #define TIME_TO_EMPTY 0x12
 #define STATUS 0x16
 #define CYCLE_COUNT 0x17
@@ -44,7 +44,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  Serial.println("Smart Battery SMBUS Analyzer");
+  Serial.println("Smart Battery Analyzer");
   Serial.println("Designed by Dustin Christensen");
   printSeparator();
   
@@ -117,8 +117,7 @@ void setAddress(byte addr)
 {
   address = addr;
   Serial.print("Address Set: ");
-  Serial.print(address);
-  Serial.println();
+  Serial.println(address);
 }
 
 float mvToV(int mv)
@@ -130,7 +129,7 @@ String convertDateCode(int dateCode)
 {
   String date = "";
   
-  int mday = B00011111 & dateCode;
+  int mday = dateCode & B00011111;
   int mmonth = dateCode >> 5 & B00001111;
   int myear = 1980 + (dateCode >> 9 & B01111111);
   
@@ -143,14 +142,36 @@ String convertDateCode(int dateCode)
   return date;
 }
 
+void printActiveStatusFlags(uint8_t flags)
+{
+    if (flags & 1 << 4) Serial.print("DISCHARGED ");
+    if (flags & 1 << 5) Serial.print("CHARGED ");
+    if (flags & 1 << 6) Serial.print("DISCHARGING ");
+    if (flags & 1 << 7) Serial.print("INIT ");
+    if (flags & 1 << 8) Serial.print("REM_TIME_ALARM ");
+    if (flags & 1 << 9) Serial.print("REM_CAPACITY_ALARM ");
+    if (flags & 1 << 11) Serial.print("TERMINATE_DISCHARGE_ALARM ");
+    if (flags & 1 << 12) Serial.print("OVERTEMP_ALARM ");
+    if (flags & 1 << 14) Serial.print("TERMINATE_CHARGE_ALARM ");
+    if (flags & 1 << 15) Serial.print("OVERCHARGE_ALARM ");
+    
+    Serial.println();
+}
+
 void printSeparator()
 {
-  Serial.println("");
-  for (byte b = 30; b > 0; b--)
+  for (byte b = 32; b > 0; b--)
   {
     Serial.print('=');
   }
-  Serial.println("");
+  Serial.println();
+}
+
+void printValue(float value, char* unit)
+{
+  Serial.print(value);
+  Serial.print(' ');
+  Serial.println(unit);
 }
 
 void displayBatteryInfo()
@@ -168,97 +189,53 @@ void displayBatteryInfo()
     Serial.print("Manufacturer: ");
     length_read = readBlock(MANUFACTURER_NAME, i2cBuffer, bufferLen);
     Serial.write(i2cBuffer, length_read);
-    Serial.println("");
-    
+    Serial.println();
     Serial.print("Device: ");
     length_read = readBlock(DEVICE_NAME, i2cBuffer, bufferLen);
     Serial.write(i2cBuffer, length_read);
-    Serial.println("");
-    
+    Serial.println();
     Serial.print("S/N: ");
-    Serial.print(serial);
-    Serial.println("");
-    
-    Serial.print("Manufacture Date: ");
+    Serial.println(serial);
+    Serial.print("Manufactured: ");
     int dateCode = fetchWord(MANUFACTURE_DATE);
     Serial.println(convertDateCode(dateCode));
-    
-    Serial.print("Spec: ");
-    Serial.print(fetchWord(SPECIFICATION_INFO));
-    Serial.println("");
-    
     Serial.print("Type: ");
     length_read = readBlock(DEVICE_CHEMISTRY, i2cBuffer, bufferLen);
     Serial.write(i2cBuffer, length_read);
-    Serial.println("");
-    
+    Serial.println();
     Serial.print("Design Voltage: ");
-    float designVoltage = mvToV(fetchWord(DESIGN_VOLTAGE));
-    Serial.print(designVoltage);
-    Serial.println("V");
-    
+    printValue(mvToV(fetchWord(DESIGN_VOLTAGE)), "V");
     Serial.print("Design Capacity: ");
-    Serial.print(fetchWord(DESIGN_CAPACITY));
-    Serial.println("mAh");
-    
-    Serial.print("Status: ");
-    Serial.print(String(fetchWord(STATUS), HEX));
-    Serial.println("");
+    printValue(fetchWord(DESIGN_CAPACITY), "mAh");
 
     Serial.println("\n[Readings]");
-    
+    Serial.print("Status: ");
+    printActiveStatusFlags(fetchWord(STATUS));
     Serial.print("Voltage: ");
-    float v = mvToV(fetchWord(VOLTAGE));
-    Serial.print(v);
-    Serial.println("V");
-    
+    printValue(mvToV(fetchWord(VOLTAGE)), "V");
     Serial.print("Current: ");
-    Serial.print(fetchWord(CURRENT));
-    Serial.println("ma");
-    
-    Serial.print("C1: ");
-    int cV1 = fetchWord(CELL1_VOLTAGE);
-    Serial.print(mvToV(cV1));
-    Serial.println("V");
-    
-    Serial.print("C2: ");
-    int cV2 = fetchWord(CELL2_VOLTAGE);
-    Serial.print(mvToV(cV2));
-    Serial.println("V");
-    
-    Serial.print("C3: ");
-    int cV3 = fetchWord(CELL3_VOLTAGE);
-    Serial.print(mvToV(cV3));
-    Serial.println("V");
-    
+    printValue(fetchWord(CURRENT), "ma");
     Serial.print("Capacity: ");
-    Serial.print(fetchWord(CAPACITY));
-    Serial.println("mAh");
+    printValue(fetchWord(CAPACITY), "mAh");
+    Serial.print("C1: ");
+    printValue(mvToV(fetchWord(CELL1_VOLTAGE)), "V");
+    Serial.print("C2: ");
+    printValue(mvToV(fetchWord(CELL2_VOLTAGE)), "V");
+    Serial.print("C3: ");
+    printValue(mvToV(fetchWord(CELL3_VOLTAGE)), "V");
+    Serial.print("Temp: ");
+    printValue(((float) fetchWord(TEMPERATURE)) / 10.0 - 273.15, "C");
     
     Serial.println("\n[Charge Information]");
     
     Serial.print("Charge: ");
-    Serial.print(fetchWord(CHARGE));
-    Serial.println("%");
-    
+    printValue(fetchWord(CHARGE), "%");
     Serial.print("Cycles: ");
-    Serial.print(fetchWord(CYCLE_COUNT));
-    Serial.println("");
-    
+    printValue(fetchWord(CYCLE_COUNT), "");
     Serial.print("Time To FULL: ");
-    Serial.print(fetchWord(TIME_TO_FULL));
-    Serial.println(" minute(s)");
-    
+    printValue(fetchWord(TIME_TO_FULL), "minutes");
     Serial.print("Time To EMPTY: ");
-    Serial.print(fetchWord(TIME_TO_EMPTY));
-    Serial.println(" minute(s)");
-    
-    Serial.println("\n[ETC]");
-    
-    Serial.print("Temp: ");
-    float temp = ((float) fetchWord(TEMPERATURE)) / 10.0 - 273.15;
-    Serial.print(temp);
-    Serial.println("C");
+    printValue(fetchWord(TIME_TO_EMPTY), "minutes");
 }
 
 int fetchWord(byte func)
