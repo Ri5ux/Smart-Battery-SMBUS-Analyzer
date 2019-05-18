@@ -48,11 +48,11 @@ Requirements:
 <br/><br/>
 
 1) Download and install Putty from here: https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html<br/>
-2) Open Device Manager and look for "Silicon Labs CP210x USB to UART Bridge" under "Ports (COM &amp; LPT)". Take note of the COM port number in parenthesis at the end of the device name.<br/>
+2) Plug in the analyzer and then open Device Manager and look for "Silicon Labs CP210x USB to UART Bridge" under "Ports (COM &amp; LPT)". Take note of the COM port number in parenthesis at the end of the device name.<br/>
 3) Open Putty. Select "Serial" under "Connection type:".<br/>
 4) Change the "Serial line" value to the COM port you noted earlier. (Commonly "COM3")<br/>
 5) Change the "Speed" value to 115200.<br/>
-6) Plug in the analyzer and click Open. This will open a new terminal connection to the analyzer. If you wish to see the startup output, press the reset button on the analyzer device.<br/>
+6) Click Open. This will open a new terminal connection to the analyzer. If you wish to see the startup output, press the reset button on the analyzer device.<br/>
 7) At this point, you're using the analyzer, you can plug in your Smart Battery and the device will automatically output information from the batteries internal BMS to the terminal window.<br/><br/>
 
 <h2>Diagnostics</h2>
