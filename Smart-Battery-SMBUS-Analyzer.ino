@@ -32,6 +32,9 @@
 
 #define bufferLen 32
 
+const int PIN_ENABLE = 5;
+const int PIN_LED = 13;
+
 byte address = 0;
 uint8_t i2cBuffer[bufferLen];
 
@@ -43,6 +46,9 @@ int serial = -1;
 void setup()
 {
   Serial.begin(115200);
+  pinMode(PIN_ENABLE, OUTPUT);
+  pinMode(PIN_LED, OUTPUT);
+  digitalWrite(PIN_ENABLE, HIGH);
 
   Serial.println("Smart Battery Analyzer");
   Serial.println("Designed by Dustin Christensen");
@@ -91,14 +97,19 @@ void loop()
       
       if (serial != -1)
       {
+        digitalWrite(PIN_LED, HIGH);
         if (canDisplay)
         {
           displayBatteryInfo();
           canDisplay = false;
+          delay(500);
+          digitalWrite(PIN_ENABLE, LOW);
         }
       }
       else
       {
+        digitalWrite(PIN_ENABLE, HIGH);
+        digitalWrite(PIN_LED, LOW);
         canDisplay = true;
       }
     }
