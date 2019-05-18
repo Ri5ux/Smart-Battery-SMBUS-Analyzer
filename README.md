@@ -37,3 +37,26 @@ Used Parameters:
 <li/>CELL2_VOLTAGE 0x3E
 <li/>CELL1_VOLTAGE 0x3F
 </ul>
+
+<h2>Instructions (Microsoft Windows)</h2>
+Requirements:
+<ul>
+<li/>Smart Battery SMBUS Analyzer
+<li/>Putty or another serial terminal application
+<li/>Smart battery
+</ul>
+<br/><br/>
+
+1) Download and install Putty from here: https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html<br/>
+2) Open Device Manager and look for "Silicon Labs CP210x USB to UART Bridge" under "Ports (COM &amp; LPT)". Take note of the COM port number in parenthesis at the end of the device name.<br/>
+3) Open Putty. Select "Serial" under "Connection type:".<br/>
+4) Change the "Serial line" value to the COM port you noted earlier. (Commonly "COM3")<br/>
+5) Change the "Speed" value to 115200.<br/>
+6) Plug in the analyzer and click Open. This will open a new terminal connection to the analyzer. If you wish to see the startup output, press the reset button on the analyzer device.<br/>
+7) At this point, you're using the analyzer, you can plug in your Smart Battery and the device will automatically output information from the batteries internal BMS to the terminal window.<br/><br/>
+
+<h2>Diagnostics</h2>
+Issue: Garbled output. Question marks, negative or missing values.<br/>
+Fix: Try "jump starting" the battery by connecting the VCC(+12.6V) and GND wires. Reconnect the battery. If the output is still garbled, give it a bit of time and try again. If there is still no output after 30 seconds of "jumping", the internal BMS might be bad or the analyzer cable might be backwards.<br/><br/>
+Issue: USB Device Not Recognized<br/>
+Fix: USB cable the analyzer is attached to is bad, too long, or the USB port it is plugged into may be weak.
