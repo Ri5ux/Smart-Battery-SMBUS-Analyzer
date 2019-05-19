@@ -34,6 +34,9 @@
 
 const int PIN_ENABLE = 5;
 const int PIN_LED = 13;
+const int PIN_LED_CHRG = A1;
+const int PIN_LED_DISCHRG = A4;
+const int PIN_LED_ALARM = A6;
 
 byte address = 0;
 uint8_t i2cBuffer[bufferLen];
@@ -48,6 +51,9 @@ void setup()
   Serial.begin(115200);
   pinMode(PIN_ENABLE, OUTPUT);
   pinMode(PIN_LED, OUTPUT);
+  pinMode(PIN_LED_CHRG, OUTPUT);
+  pinMode(PIN_LED_DISCHRG, OUTPUT);
+  pinMode(PIN_LED_ALARM, OUTPUT);
   digitalWrite(PIN_ENABLE, HIGH);
 
   Serial.println("Smart Battery Analyzer");
@@ -110,6 +116,9 @@ void loop()
       {
         digitalWrite(PIN_ENABLE, HIGH);
         digitalWrite(PIN_LED, LOW);
+        digitalWrite(PIN_LED_CHRG, LOW);
+        digitalWrite(PIN_LED_DISCHRG, LOW);
+        digitalWrite(PIN_LED_ALARM, LOW);
         canDisplay = true;
       }
     }
@@ -156,15 +165,45 @@ String convertDateCode(int dateCode)
 void printActiveStatusFlags(uint8_t flags)
 {
     if (flags & 1 << 4) Serial.print("DISCHARGED ");
-    if (flags & 1 << 5) Serial.print("CHARGED ");
-    if (flags & 1 << 6) Serial.print("DISCHARGING ");
+    if (flags & 1 << 5) {
+      Serial.print("CHARGED ");
+      digitalWrite(PIN_LED_CHRG, HIGH);
+    } else {
+      digitalWrite(PIN_LED_CHRG, LOW);
+    }
+    if (flags & 1 << 6) {
+      Serial.print("DISCHARGING ");
+      digitalWrite(PIN_LED_DISCHRG, HIGH);
+    } else {
+      digitalWrite(PIN_LED_DISCHRG, LOW);
+    }
     if (flags & 1 << 7) Serial.print("INIT ");
     if (flags & 1 << 8) Serial.print("REM_TIME_ALARM ");
     if (flags & 1 << 9) Serial.print("REM_CAPACITY_ALARM ");
-    if (flags & 1 << 11) Serial.print("TERMINATE_DISCHARGE_ALARM ");
-    if (flags & 1 << 12) Serial.print("OVERTEMP_ALARM ");
-    if (flags & 1 << 14) Serial.print("TERMINATE_CHARGE_ALARM ");
-    if (flags & 1 << 15) Serial.print("OVERCHARGE_ALARM ");
+    if (flags & 1 << 11) {
+      Serial.print("TERMINATE_DISCHARGE_ALARM ");
+      digitalWrite(PIN_LED_ALARM, HIGH);
+    } else {
+      digitalWrite(PIN_LED_ALARM, LOW);
+    }
+    if (flags & 1 << 12) {
+      Serial.print("OVERTEMP_ALARM ");
+      digitalWrite(PIN_LED_ALARM, HIGH);
+    } else {
+      digitalWrite(PIN_LED_ALARM, LOW);
+    }
+    if (flags & 1 << 14) {
+      Serial.print("TERMINATE_CHARGE_ALARM ");
+      digitalWrite(PIN_LED_ALARM, HIGH);
+    } else {
+      digitalWrite(PIN_LED_ALARM, LOW);
+    }
+    if (flags & 1 << 15) {
+      Serial.print("OVERCHARGE_ALARM ");
+      digitalWrite(PIN_LED_ALARM, HIGH);
+    } else {
+      digitalWrite(PIN_LED_ALARM, LOW);
+    }
     
     Serial.println();
 }
