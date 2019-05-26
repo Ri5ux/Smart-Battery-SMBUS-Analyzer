@@ -26,6 +26,7 @@
 #define MANUFACTURER_DATA 0x23
 #define MANUFACTURER_INFO 0x25
 #define SPECIFICATION_INFO 0x1a
+#define CELL4_VOLTAGE 0x3C
 #define CELL3_VOLTAGE 0x3D
 #define CELL2_VOLTAGE 0x3E
 #define CELL1_VOLTAGE 0x3F
@@ -273,6 +274,8 @@ void displayBatteryInfo()
     printValue(mvToV(fetchWord(CELL2_VOLTAGE)), "V");
     Serial.print("C3: ");
     printValue(mvToV(fetchWord(CELL3_VOLTAGE)), "V");
+    Serial.print("C4: ");
+    printValue(mvToV(fetchWord(CELL4_VOLTAGE)), "V");
     Serial.print("Temp: ");
     printValue(((float) fetchWord(TEMPERATURE)) / 10.0 - 273.15, "C");
     
