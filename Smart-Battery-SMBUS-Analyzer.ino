@@ -9,10 +9,12 @@
 #define MODE 0x03
 #define VOLTAGE 0x09
 #define TEMPERATURE 0x08
-#define CURRENT 0x0a
+#define CURRENT 0x0a 
 #define CAPACITY 0x10
 #define TIME_TO_FULL 0x13
 #define CHARGE 0x0d
+#define CHARGE_VOLTAGE 0x15
+#define CHARGE_CURRENT 0x14
 #define TIME_TO_EMPTY 0x12
 #define STATUS 0x16
 #define CYCLE_COUNT 0x17
@@ -129,7 +131,13 @@ void loop()
     if (millis() - lastCheck >= 2500)
     {
       lastCheck = millis();
-      displayBatteryInfo();
+  
+      serial = fetchWord(SERIAL_NUMBER);
+      
+      if (serial != -1)
+      {
+        displayBatteryInfo();
+      }
     }
   }
 }
@@ -283,6 +291,10 @@ void displayBatteryInfo()
     
     Serial.print("Charge: ");
     printValue(fetchWord(CHARGE), "%");
+    Serial.print("Charge Current: ");
+    printValue(fetchWord(CHARGE_CURRENT), "ma");
+    Serial.print("Charge Voltage: ");
+    printValue(fetchWord(CHARGE_VOLTAGE), "V");
     Serial.print("Cycles: ");
     printValue(fetchWord(CYCLE_COUNT), "");
     Serial.print("Time To FULL: ");
