@@ -1,3 +1,6 @@
+#define DEVICE_MODEL "sbsat1"
+#define DEVICE_REV 1
+
 #define SDA_PIN 2
 #define SDA_PORT PORTD
 #define SCL_PIN 3
@@ -47,6 +50,7 @@ uint8_t i2cBuffer[bufferLen];
 long lastCheck = 0;
 boolean canDisplay = true;
 boolean onPlug = true;
+boolean simulate = false;
 int serial = -1;
 
 void setup()
@@ -81,18 +85,34 @@ void loop()
   if (Serial.available() > 0) {
     String command = Serial.readStringUntil(' ');
     
+    if (command == "model") {
+      Serial.print("Model: ");
+      Serial.println(DEVICE_MODEL);
+    }
+    
+    if (command == "rev") {
+      Serial.print("Rev: ");
+      Serial.println(DEVICE_REV);
+    }
+    
     if (command == "mode") {
       String arg1 = Serial.readStringUntil(' ');
 
       if (arg1 == "continuous") {
         onPlug = false;
+        simulate = false;
         Serial.println("Mode: continuous");
       } else if (arg1 == "onplug") {
         onPlug = true;
+        simulate = false;
         Serial.println("Mode: onplug");
+      } else if (arg1 == "simulate") {
+        onPlug = false;
+        simulate = true;
+        Serial.println("Mode: simulate");
       }
     } else {
-      Serial.println("mode <onplug/continuous>");
+      Serial.println("mode <onplug/continuous/simulate>");
     }
   }
 
@@ -104,7 +124,7 @@ void loop()
   
       serial = fetchWord(SERIAL_NUMBER);
       
-      if (serial != -1)
+      if (serial != -1 || simulate)
       {
         digitalWrite(PIN_LED, HIGH);
         if (canDisplay)
@@ -134,7 +154,7 @@ void loop()
   
       serial = fetchWord(SERIAL_NUMBER);
       
-      if (serial != -1)
+      if (serial != -1 || simulate)
       {
         displayBatteryInfo();
       }
@@ -340,4 +360,3 @@ uint8_t readBlock(uint8_t command, uint8_t* blockBuffer, uint8_t blockBufferLen)
     
     return num_bytes;
 }
-
