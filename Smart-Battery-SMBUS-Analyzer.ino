@@ -65,7 +65,7 @@ void setup()
   
   if (!i2c_init())
   {
-    Serial.println("I2C init failed.");
+    Serial.println("Init failed");
   }
   else
   {
@@ -101,6 +101,7 @@ void loop()
     if (millis() - lastCheck >= 250)
     {
       lastCheck = millis();
+    Serial.println(fetchWord(STATUS));
   
       serial = fetchWord(SERIAL_NUMBER);
       
@@ -226,6 +227,13 @@ void printSeparator()
   Serial.println();
 }
 
+void printKey(char* unit)
+{
+  Serial.print(unit);
+  Serial.print(':');
+  Serial.print(' ');
+}
+
 void printValue(float value, char* unit)
 {
   Serial.print(value);
@@ -243,63 +251,62 @@ void displayBatteryInfo()
     {
       delay(100);
     }
-
-    Serial.println("[General]");
-    Serial.print("Manufacturer: ");
+    
+    printKey("Manufacturer");
     length_read = readBlock(MANUFACTURER_NAME, i2cBuffer, bufferLen);
     Serial.write(i2cBuffer, length_read);
     Serial.println();
-    Serial.print("Device: ");
+    
+    printKey("Device");
     length_read = readBlock(DEVICE_NAME, i2cBuffer, bufferLen);
     Serial.write(i2cBuffer, length_read);
     Serial.println();
-    Serial.print("S/N: ");
+    
+    printKey("SN");
     Serial.println(serial);
-    Serial.print("Manufactured: ");
+    
+    printKey("Manufactured");
     int dateCode = fetchWord(MANUFACTURE_DATE);
     Serial.println(convertDateCode(dateCode));
-    Serial.print("Type: ");
+    
+    printKey("Type");
     length_read = readBlock(DEVICE_CHEMISTRY, i2cBuffer, bufferLen);
     Serial.write(i2cBuffer, length_read);
     Serial.println();
-    Serial.print("Design Voltage: ");
+    
+    printKey("DesignVoltage");
     printValue(mvToV(fetchWord(DESIGN_VOLTAGE)), "V");
-    Serial.print("Design Capacity: ");
+    printKey("DesignCapacity");
     printValue(fetchWord(DESIGN_CAPACITY), "mAh");
-
-    Serial.println("\n[Readings]");
-    Serial.print("Status: ");
+    printKey("Status");
     printActiveStatusFlags(fetchWord(STATUS));
-    Serial.print("Voltage: ");
+    printKey("Voltage");
     printValue(mvToV(fetchWord(VOLTAGE)), "V");
-    Serial.print("Current: ");
+    printKey("Current");
     printValue(fetchWord(CURRENT), "ma");
-    Serial.print("Capacity: ");
+    printKey("Capacity");
     printValue(fetchWord(CAPACITY), "mAh");
-    Serial.print("C1: ");
+    printKey("C1");
     printValue(mvToV(fetchWord(CELL1_VOLTAGE)), "V");
-    Serial.print("C2: ");
+    printKey("C2");
     printValue(mvToV(fetchWord(CELL2_VOLTAGE)), "V");
-    Serial.print("C3: ");
+    printKey("C3");
     printValue(mvToV(fetchWord(CELL3_VOLTAGE)), "V");
-    Serial.print("C4: ");
+    printKey("C4");
     printValue(mvToV(fetchWord(CELL4_VOLTAGE)), "V");
-    Serial.print("Temp: ");
+    printKey("Temp");
     printValue(((float) fetchWord(TEMPERATURE)) / 10.0 - 273.15, "C");
-    
-    Serial.println("\n[Charge Information]");
-    
-    Serial.print("Charge: ");
+    printKey("Charge");
     printValue(fetchWord(CHARGE), "%");
-    Serial.print("Charge Current: ");
+    printKey("ChargeCurrent");
     printValue(fetchWord(CHARGE_CURRENT), "ma");
-    Serial.print("Charge Voltage: ");
-    printValue(fetchWord(CHARGE_VOLTAGE), "V");
-    Serial.print("Cycles: ");
+    printKey("ChargeVoltage");
+    printValue(mvToV(fetchWord(CHARGE_VOLTAGE)), "V");
+    printKey("Cycles");
     printValue(fetchWord(CYCLE_COUNT), "");
-    Serial.print("Time To FULL: ");
+    printKey("TTF");
     printValue(fetchWord(TIME_TO_FULL), "minutes");
-    Serial.print("Time To EMPTY: ");
+    printKey("TTE");
     printValue(fetchWord(TIME_TO_EMPTY), "minutes");
 }
 
