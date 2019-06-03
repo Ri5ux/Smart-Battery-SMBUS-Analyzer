@@ -1,4 +1,4 @@
-#define DEVICE_MODEL "sbsat1"
+#define DEVICE_MODEL "AT1"
 #define DEVICE_REV 1
 
 #define SDA_PIN 2
@@ -53,6 +53,8 @@ boolean onPlug = true;
 boolean simulate = false;
 int serial = -1;
 
+void(* resetFunc) (void) = 0;
+
 void setup()
 {
   Serial.begin(115200);
@@ -85,17 +87,15 @@ void loop()
   if (Serial.available() > 0) {
     String command = Serial.readStringUntil(' ');
     
-    if (command == "model") {
+    if (command == "reset") {
+      resetFunc();
+    } else if (command == "model") {
       Serial.print("Model: ");
       Serial.println(DEVICE_MODEL);
-    }
-    
-    if (command == "rev") {
+    } else if (command == "rev") {
       Serial.print("Rev: ");
       Serial.println(DEVICE_REV);
-    }
-    
-    if (command == "mode") {
+    } else if (command == "mode") {
       String arg1 = Serial.readStringUntil(' ');
 
       if (arg1 == "continuous") {
@@ -121,7 +121,6 @@ void loop()
     if (millis() - lastCheck >= 250)
     {
       lastCheck = millis();
-    Serial.println(fetchWord(STATUS));
   
       serial = fetchWord(SERIAL_NUMBER);
       
