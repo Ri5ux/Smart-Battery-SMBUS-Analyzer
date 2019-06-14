@@ -264,6 +264,7 @@ void displayBatteryInfo()
 {
     uint8_t length_read = 0;
 
+    Serial.print("BD");
     printSeparator();
 
     if (onPlug)
@@ -273,16 +274,25 @@ void displayBatteryInfo()
     
     printKey("Manufacturer");
     length_read = readBlock(MANUFACTURER_NAME, i2cBuffer, bufferLen);
+    if (!simulate)
     Serial.write(i2cBuffer, length_read);
+    else
+    Serial.print("OEM");
     Serial.println();
     
     printKey("Device");
     length_read = readBlock(DEVICE_NAME, i2cBuffer, bufferLen);
+    if (!simulate)
     Serial.write(i2cBuffer, length_read);
+    else
+    Serial.print("BAT");
     Serial.println();
     
     printKey("SN");
+    if (!simulate)
     Serial.println(serial);
+    else
+    Serial.println(0);
     
     printKey("Manufactured");
     int dateCode = fetchWord(MANUFACTURE_DATE);
@@ -290,39 +300,42 @@ void displayBatteryInfo()
     
     printKey("Type");
     length_read = readBlock(DEVICE_CHEMISTRY, i2cBuffer, bufferLen);
+    if (!simulate)
     Serial.write(i2cBuffer, length_read);
+    else
+    Serial.print("LION");
     Serial.println();
     
     printKey("DesignVoltage");
-    printValue(mvToV(fetchWord(DESIGN_VOLTAGE)), "V");
+    printValue(!simulate ? mvToV(fetchWord(DESIGN_VOLTAGE)) : 11.1, "V");
     printKey("DesignCapacity");
-    printValue(fetchWord(DESIGN_CAPACITY), "mAh");
+    printValue(!simulate ? fetchWord(DESIGN_CAPACITY) : 5000, "mAh");
     printKey("Status");
     printActiveStatusFlags(fetchWord(STATUS));
     printKey("Voltage");
-    printValue(mvToV(fetchWord(VOLTAGE)), "V");
+    printValue(!simulate ? mvToV(fetchWord(VOLTAGE)) : 12.66, "V");
     printKey("Current");
     printValue(fetchWord(CURRENT), "ma");
     printKey("Capacity");
-    printValue(fetchWord(CAPACITY), "mAh");
+    printValue(!simulate ? fetchWord(CAPACITY) : 4999, "mAh");
     printKey("C1");
-    printValue(mvToV(fetchWord(CELL1_VOLTAGE)), "V");
+    printValue(!simulate ? mvToV(fetchWord(CELL1_VOLTAGE)) : 4.22, "V");
     printKey("C2");
-    printValue(mvToV(fetchWord(CELL2_VOLTAGE)), "V");
+    printValue(!simulate ? mvToV(fetchWord(CELL2_VOLTAGE)) : 4.22, "V");
     printKey("C3");
-    printValue(mvToV(fetchWord(CELL3_VOLTAGE)), "V");
+    printValue(!simulate ? mvToV(fetchWord(CELL3_VOLTAGE)) : 4.22, "V");
     printKey("C4");
     printValue(mvToV(fetchWord(CELL4_VOLTAGE)), "V");
     printKey("Temp");
-    printValue(((float) fetchWord(TEMPERATURE)) / 10.0 - 273.15, "C");
+    printValue(!simulate ? ((float) fetchWord(TEMPERATURE)) / 10.0 - 273.15 : 26, "C");
     printKey("Charge");
-    printValue(fetchWord(CHARGE), "%");
+    printValue(!simulate ? fetchWord(CHARGE) : 82.11, "%");
     printKey("ChargeCurrent");
-    printValue(fetchWord(CHARGE_CURRENT), "ma");
+    printValue(!simulate ? fetchWord(CHARGE_CURRENT) : 1500, "ma");
     printKey("ChargeVoltage");
-    printValue(mvToV(fetchWord(CHARGE_VOLTAGE)), "V");
+    printValue(!simulate ? mvToV(fetchWord(CHARGE_VOLTAGE)) : 13, "V");
     printKey("Cycles");
-    printValue(fetchWord(CYCLE_COUNT), "");
+    printValue(!simulate ? fetchWord(CYCLE_COUNT) : 7, "");
     printKey("TTF");
     printValue(fetchWord(TIME_TO_FULL), "minutes");
     printKey("TTE");
